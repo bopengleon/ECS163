@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+
+<style type="text/css">
+@font-face {
+    font-family: myFirstFont;
+    src: url(Lato-Regular.ttf);
+}
+
+@keyframes pulse {
+  0% {
+    background-color: yellow;
+  }
+  50% {
+    background-color: #FF4136;
+  }
+  100% {
+    background-color: yellow;
+  }
+}
+
+	body{
+		width: 1149px;
+		margin:auto;
+    font-family: myFirstFont;
+	}
+  header{
+    padding-bottom: 200px;
+    padding-top: 200px;
+  }
+  a{
+    text-decoration: none;
+    color:red;
+  }
+  a:hover{
+    font-size:150%;
+    color:white;
+    background-color: black;
+  }
+  h1,h2{
+     animation: pulse 5s infinite;
+  }
+  svg{margin: auto;}
+</style>
+	<title>p1</title>
+</head>
+
+<body >
+<header>
+<h1><strong> 2011 Missouri State Expenditures Analysis</strong></h1>  
+
+<h3 style="width: 600px;"> This project investigate the data from Missouri State expediture. Data includes 150000 accounts. Data is categorized by categories, agencies and Vendors.  </h3>
+<strong> My questions:</strong>
+<ul  style=" padding-bottom: 150px;">
+  <li><a href="#1"> Which Agency cost<strong> most </strong>on single Expenditures ?</a></li>
+  <li><a href="#2"> Which category cost<strong> most </strong>money ? </a></li>
+  <li><a href="#3"> Which Agencies cost<strong> most </strong>in 2011 ?</a></li>
+</ul>
+</header>
+
+<div id="1" style="padding-top: 50px;">
+<style>
+
+text {
+  text-anchor: middle;
+}
+
+
+</style>
+<svg width="650" height="700"></svg>
+<div style="float: left; width: 300px">
+  <h2>Bubble graph of Agency's average Expenditures</h2>
+  <p style="padding-top:  100px;">This graph investigates the relationship between the averages of agencys' expenditures. Since data range in large scale. An average can show the different agency's Expenditures. Which category cost most on single Expenditures. In total 25 agency.Higher Education cost most on single Expenditures. The marginal cost on education can be relatively high than other category. Also, elementary and secondary education rank third. Social service ranked second among 25 agency.Single expenditures on education and social service are relatively high. This leads to marginal cost can be relatively high. </p>
+</div>
+<script src="d3.min.js"></script>
+
+<script>
+
+var svg= d3.select("svg"),
+    width = +svg.attr("width");
+
+var format = d3.format(",d");
+
+var color = d3.scaleOrdinal(d3.schemeCategory20c);
+
+var pack = d3.pack()
+    .size([width, width])
+    .padding(1.5);
+
+d3.csv("Sheet_1_data-3.csv", function(d) {
+  d.Average = +d.Average;
+  if (d.Average) return d;
+}, function(error, classes) {
+  if (error) throw error;
+
+  var root = d3.hierarchy({children: classes})
+      .sum(function(d) { return d.Average; })
+      .each(function(d) {
+        if (id = d.data.id) {
+          var id, i = id.lastIndexOf(".");
+          d.id = id;
+          d.package = id.slice(0, i);
+          d.class = id.slice(i + 1);
+        }
+      });
+
+  var node = svg.selectAll(".node")
+    .data(pack(root).leaves())
+    .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  node.append("circle")
+      .attr("id", function(d) { return d.id; })
+      .attr("r", function(d) { return d.r; })
+      .style("fill", function(d) { return color(d.data.Agency_Name); })
+      .on("mouseover", function(d) {
+       d3.select(this)
+       .style("fill",function() {
+        return "hsl(" + Math.random() * 360 + ",90%,70%)";
+        });
+       // .style("fill", "red");
+       })                  
+      // .on("mouseout", function(d) {
+      //  d3.select(this).attr("r", 5.5).style("fill", "#fff8ee");
+      // });
+
+  node.append("clipPath")
+      .attr("id", function(d) { return "clip-" + d.id; })
+    .append("use")
+      .attr("xlink:href", function(d) { return "#" + d.id; });
+
+  node.append("text")
+  .text(function(d) { return d.data.Average;})
+      .text(function(d) { return d.data.Agency_Name;});
+
+
+  // node.append("title")
+  //     .text(function(d) { return d.id + "\n" + format(d.Average); });
+});
+
+</script>
+
+</div>
+<div id="2" style="padding-top: 100px">
+	<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="//rawgithub.com/Caged/d3-tip/master/examples/example-styles.css">
+<style> 
+.bar { fill: steelblue; }
+.bar:hover{
+  fill:red;
+}
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+
+</style>
+<body>
+<script src="d3.min.js"></script>
+<script src="d3-tip.js" type="text/javascript"></script>
+<script>
+
+var margin = {top: 70, right: 20, bottom: 230, left: 140},
+    width = 960 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
+var x = d3.scaleBand()
+          .range([0, width])
+          .padding(0.1);
+var y = d3.scaleLinear()
+          .range([height, 0]);
+var color = d3.scaleOrdinal(d3.schemeCategory20c);
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>"+d.Category_Name+"</strong>" +"<br>"+ d.Payments_Total + "</span>";
+  })
+
+
+var div = d3.select("body").append("div") 
+    .attr("class", "tooltip")       
+    .style("opacity", 0);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+    svg.call(tip);
+d3.csv("Sheet_1_data-2.csv", function(error, data) {
+  if (error) throw error;
+  data.forEach(function(d) {
+    d.Payments_Total = +d.Payments_Total;
+  });
+  x.domain(data.map(function(d) { return d.Category_Name; }));
+  y.domain([0, d3.max(data, function(d) { return d.Payments_Total; })]);
+  svg.selectAll(".bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.Category_Name); })
+      .attr("width", x.bandwidth())
+      .attr("y", function(d) { return y(d.Payments_Total); })
+      .style("fill", function(d) { return color(d.Category_Name); })
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
+ 
+      .attr("height", function(d) { return height - y(d.Payments_Total); });
+  svg.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", "rotate(-65)");
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+});
+
+
+
+</script>
+<div style="width: 800px;">
+  <h2>Bar Chart of Expenditures of Missouri state by category in 2011</h2>
+  <p style="padding-top:  20px;">
+  <strong>Total Amont:$19,810,054,332</strong>By analyzing  the data, I got the total expenditure of Missouri state is $19,810,054,332. Through this graph, we can see 83% of expenditure goes to program distribution. 7% of total expenditrue goes to property & improvment. And the other 17 category occuppies the 10% of the expenditure.</p> 
+</div>
+</body>
+</div>
+<div id="3">
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.arc text {
+  
+  text-anchor: middle;
+}
+
+.arc path {
+  stroke: #fff;
+}
+.arc path:hover{
+  fill:red;
+}
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+</style>
+<body>
+<script src="d3.min.js"></script>
+<script src="d3-tip.js" type="text/javascript"></script>
+<script>
+
+var width = 760,
+    height = 700,
+    radius = Math.min(width, height) / 2;
+
+var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+var arc = d3.arc()
+    .outerRadius(radius - 10)
+    .innerRadius(radius - 200);
+
+var pie = d3.pie()
+    .sort(null)
+    .value(function(d) { return 5; });
+
+var svg = d3.select("body")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>"+d.data.Agency_Name+"</strong>" +"<br>"+ d.data.Payments_Total + "</span>";
+  })
+
+d3.csv("Sheet_1_data.csv", type, function(error, data) {
+  if (error) throw error;
+
+  var g = svg.selectAll(".arc")
+      .data(pie(data))
+      .enter().append("g")
+      .attr("class", "arc")
+      // .attr("class", "labels")
+      // .attr("class", "lines");
+  g.append("path")
+      .attr("d", arc)
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
+      .style("fill", function(d) { return color(d.data.Agency_Name); });
+
+
+  g.append("text")
+      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+      .attr("dy", ".35em");
+});
+
+svg.transition()
+      .delay(50000);
+pie.value(function(d){
+  return d.Payments_Total;
+});
+svg.call(tip);
+
+function type(d) {
+  d.Payments_Total = +d.Payments_Total;
+  return d;
+}
+
+</script>
+<div style="float: left; width: 300px">
+  <h2>Donut graph of Missouri State Agencies's Expenditure</h2>
+  <p style="padding-top:  100px; padding-right: 50px;">So far as we know that high education agency has really high marignal cost. So which agency does the government spend their money. Social service,Elementory education and transportation. Then High education agency ranked fourth. <br><strong>Total Amont:$19,810,054,332</strong></p>
+</div>
+	
+</div>
+<footer style=" width: 100%; margin: auto; text-align: center;padding-bottom: 100px;padding-top: 100px;">
+     by Bo Peng <br> Data:https://data.mo.gov/Government-Administration/2011-State-Expenditures/nyk8-k9ti <br>software support: Tableau public
+</footer>
+</body>
+</html>

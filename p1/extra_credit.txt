@@ -1,0 +1,6 @@
+extra credit：
+Include interactivity in the charts
+Use motion, flicker, animation in the charts
+Use annotations or highlighting on the charts
+
+All three graphs are very interactive. Also, links are responsive. 
